@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Create three equal columns that floats next to each other */
+        .column {
+            float: left;
+            width: 33.33%;
+            padding: 30px;
+            height: auto;
+            margin-right: auto;
+            /* Should be removed. Only for demonstration */
+        }
+
+        .middle{
+            width: 30%;
+        }
+
+        .right {
+            width: 17%;
+
+        }
+
+        .left {
+            width: 51%;
+
+        }
+
+        /* Clear floats after the columns */
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        /* Responsive layout - makes the three columns stack on top of each other instead of next to each other */
+        @media screen and (max-width: 600px) {
+            .column {
+                width: 100%;
+            }
+        }
+
+        .vertical-row {
+            Float: left;
+            height: 100px;
+            width: 1px; /* edit this if you want */
+            background-color: red
+        }
+    </style>
+</head>
+
+<body>
+    <div class="col-md-10 offset-md-1">
+        <div class="row">
+
+            <form (ngSubmit)="translateA()">
+                <div class="column">
+                    <div class="form-group">
+                        <label>English</label>
+                        <input type="text" class="form-control" id="Req" [(ngModel)]="Req" name="Req">
+                    </div>
+                </div>
+
+                <div class="column">
+                    <div class="text-center">
+                        <br>
+                        <button style="background-color: #ff8c00;" class="btn" type="submit">
+                            <i _ngcontent-ilk-c65="" class="pi pi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="column">
+                    <div class="form-group">
+                        <label>Arabic</label>
+                        <input type="text" class="form-control" value={{transReq}} disabled>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <div class="mt-4">
+    <div class="row">
+        <div class="column left">
+            <p-card [style]="{'width': '47rem', 'margin-rigth': '2em'}">
+            <h2 style="text-align: center;">Comments</h2>
+            <br>
+            <div class="p-formgroup-inline">
+                <div class="p-field-checkbox">
+                    <p-checkbox name="siteH" value="Hespress" [(ngModel)]="sites2" inputId="siteH"></p-checkbox>
+                    <label for="siteH">Hespress</label>
+                </div>
+                <div class="p-field-checkbox">
+                    <p-checkbox name="siteT" value="Twitter" [(ngModel)]="sites2" inputId="siteT"></p-checkbox>
+                    <label for="siteT">Twitter</label>
+                </div>
+                <div class="p-field-checkbox">
+                    <p-checkbox name="siteF" value="Facebook" [(ngModel)]="sites2" inputId="siteF"></p-checkbox>
+                    <label for="siteF">Facebook</label>
+                </div>
+                <div class="p-field-checkbox">
+                    <p-checkbox name="siteY" value="Youtube" [(ngModel)]="sites2" inputId="siteY"></p-checkbox>
+                    <label for="siteY">Youtube</label>
+                </div>
+                <br>
+                  </div>
+                  <label >Max number of comments per site : &nbsp;</label>
+                
+                    <p-dropdown [options]="maxs" [(ngModel)]="selectedMax" optionLabel="name" placeholder="Select a number"></p-dropdown>
+          
+            <br><br>
+            <div>
+                <button style="background-color: #ff8c00;" class="btn" (click)="Scraping()">Download</button>
+                
+                <button style="float: right;background-color: #ff8c00;" class="btn" (click)="SummaryComments()"
+                    [disabled]="!polarity">Get
+                    Summary</button>
+            </div>
+            <br>
+            <div *ngIf="opi">
+            <div *ngIf="isCompleted">
+                <ul class="list-group">
+                    Searching in {{site}} website...
+                </ul>
+                <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+            </div>
+        
+            <div *ngIf="ispol">
+                <ul class="list-group">
+                    Calculation of polarities...
+                </ul>
+                <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+            </div>
+            <p-table [value]="opi" dataKey="site">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 3rem"></th>
+                        <th pSortableColumn="site">All comments <p-sortIcon field="site"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="comments.length">Number of comments <p-sortIcon field="comments.length">
+                            </p-sortIcon>
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-opinion let-expanded="expanded">
+                    <tr>
+                        <td>
+                            <button type="button" pButton pRipple [pRowToggler]="opinion"
+                                class="p-button-text p-button-rounded p-button-plain"
+                                [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                        </td>
+                        <td>{{opinion.site}}</td>
+                        <td>{{opinion.comments.length}}</td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="rowexpansion" let-opinion>
+                    <tr>
+                        <td colspan="7">
+                            <div class="p-p-3">
+                                <p-table [value]="opinion.comments" dataKey="id">
+                                    <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 5rem" pSortableColumn="idCo">Id<p-sortIcon field="idCo"></p-sortIcon>
+                        </th>
+                        <th  pSortableColumn="comment">Comments <p-sortIcon field="comment"></p-sortIcon>
+                        </th>
+                        <th style="width: 5rem" pSortableColumn="date">Date <p-sortIcon field="date"></p-sortIcon>
+                        </th>
+                        <th style="width: 5rem">Polarity
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-comment>
+                    <tr>
+                        <td>{{comment.idCo}}</td>
+                        <td>{{comment.comment}}</td>
+                        <td>{{comment.date}}</td>
+                        <td >{{comment.polarity}}</td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="6">There are no comment for this site.</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+        </td>
+        </tr>
+    
+        </ng-template>
+        </p-table>
+    
+    </div>
+            </p-card>
+
+    </div>
+
+    <div class="column middle">
+        <p-card [style]="{'width': '27rem', 'margin-bottom': '2em'}">
+        <h2 style="text-align: center;">Summary</h2>
+        <br>
+        <div *ngIf="isSum">
+        <ul class="list-group">
+            Process of the summary of all comments...
+        </ul>
+        <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+        </div>
+
+        <div>
+        <p-card header="Arabic" [style]="{'width': '24rem', 'margin-bottom': '2em'}">
+            <p>{{summary}}</p>
+        </p-card>
+        <p-card header="English" [style]="{'width': '24rem', 'margin-bottom': '2em'}">
+            <p>{{transReq2}}</p>
+        </p-card>
+        </div>
+    </p-card>
+    </div>
+    <div class="column right">
+        <p-card [style]="{'width': '13rem'}">
+        <h2 style="text-align: center;">Process</h2>
+        <br>
+       
+        <div *ngFor="let category of categories" class="p-field-checkbox">
+
+            <p-checkbox name="group2" value="category" [value]="category" [(ngModel)]="selectedCategories"
+                [inputId]="category.key" [disabled]="category.key"></p-checkbox>
+            <label style="color: #808080;" [for]="category.key">{{category.name}}</label>
+        </div>
+    
+</p-card>
+    </div>
+    </div>
+
+    </div>
+
+</body>
+
+</html>
